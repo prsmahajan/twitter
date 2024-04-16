@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "prisma": "^5.12.1",
     "tsc-watch": "^6.2.0",
     "typescript": "^5.4.5"
