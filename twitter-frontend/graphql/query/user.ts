@@ -6,3 +6,15 @@ export const verifyUserGoogleTokenQuery = gql(`
     verifyGoogleToken(token: $token)
   }
 `);
+
+export const getCurrentUserQuery = gql(`
+  query GetCurrentUser {
+    getCurrentUser {
+      id
+      profileImageUrl
+      email
+      firstName
+      lastName
+    }
+  }
+`);
