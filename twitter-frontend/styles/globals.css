@@ -18,6 +18,11 @@
   scrollbar-width: none; /* Firefox */
 }
 
+*:focus {
+  outline: none;
+}
+
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
