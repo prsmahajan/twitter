@@ -1,8 +1,9 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { BsBell, BsBookmark, BsEnvelope, BsTwitter } from "react-icons/bs";
 import {
   BiHash,
   BiHomeCircle,
+  BiImageAlt,
   BiImages,
   BiMoney,
   BiUser,
@@ -16,6 +17,8 @@ import { verifyUserGoogleTokenQuery } from "../graphql/query/user";
 import { useCurrentUser } from "@/hooks/user";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
+import { useGetAllTweets } from "@/hooks/tweet";
+import { Maybe, Tweet, User } from "@/gql/graphql";
 
 interface TwitterSideButton {
   title: string;
@@ -59,9 +62,27 @@ const sidebarMenuItems: TwitterSideButton[] = [
 
 export default function Home() {
   const { user } = useCurrentUser();
+  const { tweets = [] } = useGetAllTweets();
+  const { mutate } = useCreateTweet();
+
   const queryClient = useQueryClient();
 
-  const handleImageSelect = useCallback(_ => {
+  const [content, setContent] = useState("");
+
+  const handleSelectImage = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+  }, []);
+
+  const handleCreateTweet = useCallback(() => {
+    mutate({
+      content,
+    });
+  }, [content, mutate]);
+
+  const handleImageSelect = useCallback(() => {
     const input = document.createElement("input");
     input.setAttribute("type", "file");
     input.setAttribute("accept", "image/*");
@@ -72,7 +93,6 @@ export default function Home() {
     async (cred: CredentialResponse) => {
       const googleToken = cred.credential;
       if (!googleToken) return toast.error(`Google token not found`);
-
       const { verifyGoogleToken } = await graphqlClient.request(
         verifyUserGoogleTokenQuery,
         { token: googleToken }
@@ -83,7 +103,7 @@ export default function Home() {
       if (verifyGoogleToken)
         window.localStorage.setItem("__twitter_token", verifyGoogleToken);
 
-      await queryClient.invalidateQueries(["curent-user"]);
+      await queryClient.invalidateQueries({ queryKey: ["curent-user"] });
     },
     [queryClient]
   );
@@ -147,13 +167,21 @@ export default function Home() {
                 </div>
                 <div className="col-span-11">
                   <textarea
-                    className="w-full bg-transparent text-xl px-3 focus:border-b-2 border-b-slate-700"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    className="w-full bg-transparent text-xl px-3 border-b border-slate-700"
                     placeholder="What's happening?"
                     rows={3}
                   ></textarea>
-                  <div className="mt-1 flex justify-between items-center">
-                    <BiImages onClick={handleImageSelect} className="text-xl" />
-                    <button className="bg-[#1d9bfa] px-12 py-2 rounded-full text-md font-semibold">
+                  <div className="mt-2 flex justify-between items-center">
+                    <BiImageAlt
+                      onClick={handleSelectImage}
+                      className="text-xl"
+                    />
+                    <button
+                      // onClick={handleCreateTweet}
+                      className="bg-[#1d9bf0] font-semibold text-sm py-2 px-4 rounded-full"
+                    >
                       Post
                     </button>
                   </div>
@@ -161,12 +189,9 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
-          <FeedCard />
+          {tweets?.forEach((tweet) => (
+            tweet ? <FeedCard key={tweet?.id} data={tweet as Tweet} /> : null
+          ))}
         </div>
         <div className="col-span-3 p-5">
           {!user && (

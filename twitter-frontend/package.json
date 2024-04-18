@@ -2,6 +2,7 @@
   "name": "twitter-frontend",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "scripts": {
     "dev": "concurrently \"yarn run codegen\" next dev",
     "build": "next build",
