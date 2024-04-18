@@ -5,7 +5,7 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { prismaClient } from "../clients/db";
 import { User } from "./user";
-import { Tweet } from "../tweet";
+import { Tweet } from "./tweet";
 import { GraphqlContext } from "../interfaces";
 import JWTService from "../services/jwt";
 

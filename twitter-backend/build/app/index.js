@@ -19,7 +19,7 @@ const cors_1 = __importDefault(require("cors"));
 const server_1 = require("@apollo/server");
 const express4_1 = require("@apollo/server/express4");
 const user_1 = require("./user");
-const tweet_1 = require("../tweet");
+const tweet_1 = require("./tweet");
 const jwt_1 = __importDefault(require("../services/jwt"));
 function initServer() {
     return __awaiter(this, void 0, void 0, function* () {
