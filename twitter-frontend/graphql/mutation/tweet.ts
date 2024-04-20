@@ -1,6 +1,6 @@
-import { graphql } from "@/gql";
+import { gql } from "graphql-tag";
 
-export const createTweetMutation = graphql(`
+export const createTweetMutation = gql(`
   #graphql
   mutation CreateTweet($payload: CreateTweetData!) {
     createTweet(payload: $payload) {

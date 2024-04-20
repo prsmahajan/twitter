@@ -17,12 +17,22 @@ import { verifyUserGoogleTokenQuery } from "../graphql/query/user";
 import { useCurrentUser } from "@/hooks/user";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { useGetAllTweets } from "@/hooks/tweet";
+import { useCreateTweet, useGetAllTweets } from "@/hooks/tweet";
 import { Maybe, Tweet, User } from "@/gql/graphql";
+import { getAllTweetsQuery } from "@/graphql/query/tweet";
+import { GetServerSideProps } from "next";
 
 interface TwitterSideButton {
   title: string;
   icon: React.ReactNode;
+}
+
+interface GetAllTweetsResponse {
+  getAllTweets: Tweet[];
+}
+
+interface HomeProps {
+  tweets?: Tweet[];
 }
 
 const sidebarMenuItems: TwitterSideButton[] = [
@@ -60,7 +70,7 @@ const sidebarMenuItems: TwitterSideButton[] = [
   },
 ];
 
-export default function Home() {
+export default function Home(props: HomeProps) {
   const { user } = useCurrentUser();
   const { tweets = [] } = useGetAllTweets();
   const { mutate } = useCreateTweet();
@@ -93,7 +103,7 @@ export default function Home() {
     async (cred: CredentialResponse) => {
       const googleToken = cred.credential;
       if (!googleToken) return toast.error(`Google token not found`);
-      const { verifyGoogleToken } = await graphqlClient.request(
+      const { verifyGoogleToken }: any = await graphqlClient.request(
         verifyUserGoogleTokenQuery,
         { token: googleToken }
       );
@@ -179,7 +189,7 @@ export default function Home() {
                       className="text-xl"
                     />
                     <button
-                      // onClick={handleCreateTweet}
+                      onClick={handleCreateTweet}
                       className="bg-[#1d9bf0] font-semibold text-sm py-2 px-4 rounded-full"
                     >
                       Post
@@ -189,9 +199,10 @@ export default function Home() {
               </div>
             </div>
           </div>
-          {tweets?.forEach((tweet) => (
+          {Array.isArray(tweets) &&
+          tweets.map((tweet: Tweet) =>
             tweet ? <FeedCard key={tweet?.id} data={tweet as Tweet} /> : null
-          ))}
+          )}
         </div>
         <div className="col-span-3 p-5">
           {!user && (
@@ -207,3 +218,14 @@ export default function Home() {
     </div>
   );
 }
+
+// export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+//   const allTweets = await graphqlClient.request<GetAllTweetsResponse>(
+//     getAllTweetsQuery
+//   );
+//   return {
+//     props: {
+//       tweets: allTweets?.getAllTweets as Tweet[],
+//     },
+//   };
+// };
